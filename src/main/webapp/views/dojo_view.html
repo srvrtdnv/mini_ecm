@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>JUST FOR TEST</title>
+        <script src="views/dojo_script.js"></script>
+        
+	    <link rel="stylesheet" href="views/dijit/themes/claro/claro.css">
+	
+        <script>dojoConfig = {parseOnLoad: true}</script>
+        <script src="views/dojo/dojo.js"></script>
+        
+        <script>
+            require(["dojo/parser", "dijit/layout/TabContainer", "dijit/layout/ContentPane", "dijit/layout/BorderContainer"]);
+	    </script>
+       
+        <style type="text/css">
+            html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                overflow:hidden;
+            }
+
+            #borderContainer {
+                width: 100%;
+                height: 100%;
+            }
+	    </style>
+       
+       
+        
+    </head>
+    <body class="claro">
+        
+        
+        <div data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design:'sidebar', gutters:true, liveSplitters:true" id="borderContainer">
+            <div id='tree' data-dojo-type="dijit/layout/ContentPane" data-dojo-props="splitter:true, region:'leading'" style="width: 20%px;">
+                
+                <ul>
+                    <li>
+                       Организации
+                       <ul>
+                           <li>
+                               Подразделения
+                               <ul>
+                                   <li>Сотрудники</li>
+                               </ul>
+                           </li>
+                       </ul> 
+                    </li>
+                    <li>Поручения</li>
+                </ul>
+                <a id="link1" href="#">Ссылка</a><br>
+                <a id="link2" href="#">Ссылка</a><br>
+                <a id="link3" href="#">Ссылка</a><br>
+                <a id="link4" href="#">Ссылка</a><br>
+                <a id="link5" href="#">Ссылка</a><br>
+                <a id="link6" href="#">Ссылка</a><br>
+                <a href="#">Ссылка</a><br>
+                <a href="#">Ссылка</a><br>
+                <a href="#">Ссылка</a><br>
+                <a href="#">Ссылка</a>
+            
+            </div>
+            
+            
+            <div id='content' data-dojo-type="dijit/layout/ContentPane" data-dojo-props="splitter:true, region:'center'">
+                <div id='tabs' data-dojo-type="dijit/layout/TabContainer" style="width: 100%; height: 100%;">
+                        
+                </div>
+            </div>
+        </div>
+        
+       <script>
+        require([
+            "dojo/_base/window", "dojo/store/Memory",
+            "dijit/tree/ObjectStoreModel", "dijit/Tree",
+            "dojo/domReady!"
+        ], function(win, Memory, ObjectStoreModel, Tree){
+
+            createTree(win, Memory, ObjectStoreModel, Tree);
+
+
+        });
+        dojo.connect(dojo.byId("tree"), "a:click", function() {addTab(this)});
+	   </script>
+    </body>
+</html>
+
+

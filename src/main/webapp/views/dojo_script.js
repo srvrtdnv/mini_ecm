@@ -3,15 +3,15 @@ function createTree(win, Memory, ObjectStoreModel, Tree){
     // Create test store, adding the getChildren() method required by ObjectStoreModel
     var myStore = new Memory({
         data: [
-            { id: 'root', name:'root', type:'root'},
-                { id: 'structure', name:'Structure', type:'structure', parent: 'root'},
-                { id: 'orgs', name:'Organisations', type:'orgs', parent: 'structure'},
-                    { id: 'subvisions', name:'Subvisions', type:'subvisions', parent: 'orgs'},
-                        { id: 'empls', name:'Employees', type:'empls', parent: 'subvisions' },
-                { id: 'messages', name:'Messages', type:'messages', parent: 'root'},
-                    { id: 'allMsgs', name:'All messages', type:'allMsgs', parent: 'messages'},
-                    { id: 'myMsgs', name:'My messages', type:'myMsgs', parent: 'messages'},
-                    { id: 'msgsForMe', name:'Messages for me', type:'msgsForMe', parent: 'messages'}
+            {id: 'root'},
+                { id: 'structure', name:'Structure', type: 'not link', parent: 'root'},
+                { id: 'orgs', name:'Organisations', parent: 'structure'},
+                    { id: 'subvisions', name:'Subvisions', parent: 'orgs'},
+                        { id: 'empls', name:'Employees', parent: 'subvisions'},
+                { id: 'messages', name:'Messages', type: 'not link', parent: 'root'},
+                    { id: 'allMsgs', name:'All messages', parent: 'messages'},
+                    { id: 'myMsgs', name:'My messages', parent: 'messages'},
+                    { id: 'msgsForMe', name:'Messages for me', parent: 'messages'}
         ],
         getChildren: function(object){
             return this.query({parent: object.id});
@@ -51,12 +51,12 @@ function destroyTab(link) {
     }
 }
 
-function addTab(link, request) {
-    console.log(link.id);
-    if (!dojo.byId(link.id + "_tab")) {
+function addTab(node, request) {
+    if (!dojo.byId(node.id) && node.type != 'not link') {
         require(["dijit/registry", "dijit/layout/ContentPane"], function(registry, ContentPane){
             var tabs = registry.byId("tabs");
-            var pane = new ContentPane({ title:"Remote Content", closable: 'true'});
+            var pane = new ContentPane({ title: node.name, closable: 'true', id: node.id});
+            pane.set("href", "test_ajax");
             tabs.addChild(pane);
         });
         //dojo.place('<div data-dojo-type="dijit/layout/ContentPane" title="My last tab" data-dojo-props="closable:true">New tab<div>', 'tabs', 'into');

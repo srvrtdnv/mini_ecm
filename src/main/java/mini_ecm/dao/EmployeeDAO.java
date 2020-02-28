@@ -7,7 +7,9 @@ import mini_ecm.model.Employee;
 
 public interface EmployeeDAO {
 	
-	public Employee findById(String id);
+	public Employee findById(Long id);
 	public List<Employee> findAll();
+	public void delete(Employee empl);
+	public void saveOrUpdate(Employee empl);
 
 }

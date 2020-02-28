@@ -22,7 +22,7 @@ public class Employee {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
-	private int id;
+	private Long id;
 	
 	@Column(name = "first_name")
 	private String firstName;
@@ -36,7 +36,7 @@ public class Employee {
 	@Column(name = "position")
 	private String position;
 	
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "tasks_employees", 
 			joinColumns = @JoinColumn(name = "task_id"),
             inverseJoinColumns = @JoinColumn(name = "employee_id"))
@@ -75,12 +75,12 @@ public class Employee {
 	}
 
 
-	public int getId() {
+	public Long getId() {
 		return id;
 	}
 
 
-	public void setId(int id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 

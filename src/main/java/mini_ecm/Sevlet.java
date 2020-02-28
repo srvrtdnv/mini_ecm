@@ -12,8 +12,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 
 import mini_ecm.dao.impl.hibernate.HibernateSessionFactoryHolder;
+import mini_ecm.dao.impl.hibernate.HibernateTaskDAO;
 import mini_ecm.model.Employee;
 import mini_ecm.model.Subvision;
 import mini_ecm.model.Task;
@@ -28,7 +30,7 @@ public class Sevlet extends HttpServlet {
 		Employee empl = new Employee();
 		Subvision subv= new Subvision();
 		
-		task.setMessageAuthor(empl);
+		task.setTaskAuthor(empl);
 		task.setText("MY TEXT");
 		//task.setControlled(false);
 		//task.setDone(false);
@@ -49,9 +51,24 @@ public class Sevlet extends HttpServlet {
 		subv.setManager(empl);
 		subv.setPhNumber("+74953626961");
 		
-		doHibernateTest(subv);
+		
+		doHibernateFindTaskByAuthorTest();
 		
 		req.getRequestDispatcher("/views/dojo_view.html").forward(req, resp);
+	}
+	
+	public void doHibernateFindTaskByAuthorTest() {
+		Session session = HibernateSessionFactoryHolder.getFactory().openSession();
+
+		Query qry = session.createQuery("FROM Task WHERE taskAuthor.id = :author");
+		
+		qry.setParameter("author", 4L);
+		
+		List<Task> result = (List<Task>) qry.list();
+		
+		session.close();
+		
+		System.out.println(result.size());
 	}
 	
 	public void doHibernateTest(Subvision subv) {
@@ -61,6 +78,8 @@ public class Sevlet extends HttpServlet {
 		session.save(subv);
 		transaction.commit();
 		session.close();
+		
+		System.out.println(new HibernateTaskDAO().findById(4L).getTaskAuthor().getFirstName());
 	}
 	
 	@Override

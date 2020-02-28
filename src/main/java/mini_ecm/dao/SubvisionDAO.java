@@ -7,7 +7,9 @@ import mini_ecm.model.Subvision;
 
 public interface SubvisionDAO {
 	
-	public Subvision findById(String id);
+	public Subvision findById(Long id);
 	public List<Subvision> findAll();
+	public void delete(Subvision subv);
+	public void saveOrUpdate(Subvision subv);
 
 }

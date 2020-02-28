@@ -1,4 +1,4 @@
-package mini_ecm.dao;
+package mini_ecm.dao.impl.hibernate;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -10,7 +10,7 @@ import mini_ecm.model.Subvision;
 import mini_ecm.model.Task;
 
 public class HibernateSessionFactoryHolder {
-	private static SessionFactory factory;
+private static SessionFactory factory;
 	
 	public static SessionFactory getFactory() {
 		if (factory == null) {

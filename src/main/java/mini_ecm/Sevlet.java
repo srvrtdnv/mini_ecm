@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import mini_ecm.dao.HibernateSessionFactoryHolder;
+import mini_ecm.dao.impl.hibernate.HibernateSessionFactoryHolder;
 import mini_ecm.model.Employee;
 import mini_ecm.model.Subvision;
 import mini_ecm.model.Task;

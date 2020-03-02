@@ -2,11 +2,14 @@ package mini_ecm.dao.impl.hibernate;
 
 import java.util.List;
 
+import javax.enterprise.context.RequestScoped;
+
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 
 import mini_ecm.dao.TaskDAO;
 import mini_ecm.model.Task;
+
 
 public class HibernateTaskDAO implements TaskDAO {
 

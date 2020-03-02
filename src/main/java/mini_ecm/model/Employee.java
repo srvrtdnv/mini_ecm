@@ -15,6 +15,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "employees")
 public class Employee {
@@ -36,12 +38,14 @@ public class Employee {
 	@Column(name = "position")
 	private String position;
 	
-	@ManyToMany(fetch = FetchType.LAZY)
+	@JsonIgnore
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "tasks_employees", 
 			joinColumns = @JoinColumn(name = "task_id"),
             inverseJoinColumns = @JoinColumn(name = "employee_id"))
 	private List<Task> tasks;
 	
+	@JsonIgnore
 	@OneToMany(mappedBy = "taskAuthor", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private List<Task> createdMessages;
 

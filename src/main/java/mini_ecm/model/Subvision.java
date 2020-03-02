@@ -61,4 +61,9 @@ public class Subvision {
 		this.manager = manager;
 	}
 	
+	@Override
+	public String toString() {
+		return name;
+	}
+	
 }

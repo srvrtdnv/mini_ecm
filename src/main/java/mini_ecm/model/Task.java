@@ -5,6 +5,7 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -37,10 +38,10 @@ public class Task {
 	@Column(name = "is_controlled", columnDefinition = "boolean default false")
 	private boolean isControlled;
 	
-	@ManyToMany(mappedBy = "tasks")
+	@ManyToMany(mappedBy = "tasks", fetch = FetchType.EAGER)
 	private List<Employee> doers;
 	
-	@ManyToOne(optional = false, cascade = CascadeType.ALL)
+	@ManyToOne(optional = false, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "author_id", nullable = false)
 	private Employee taskAuthor;
 
@@ -113,7 +114,13 @@ public class Task {
 		StringBuilder sb = new StringBuilder("");
 		
 		sb.append("Id: " + id);
+		sb.append(". Subject: " + subject);
 		sb.append(". Text: " + text);
+		sb.append(". Is done: " + isDone);
+		sb.append(". Is controlled: " + isControlled);
+		sb.append(". Author id: " + taskAuthor.getId());
+		sb.append(". Doers size: " + doers.size());
+		sb.append(". Time: " + executionTime);
 		
 		return sb.toString();
 	}

@@ -25,8 +25,8 @@ public class Subvision {
 	@Column(name = "phone_number")
 	private String phNumber;
 	
-	@OneToOne(optional = false, cascade = CascadeType.ALL)
-	@JoinColumn(name = "manager")
+	@OneToOne(optional = true, cascade = CascadeType.ALL)
+	@JoinColumn(name = "manager", nullable = true)
 	private Employee manager;
 
 	public Long getId() {

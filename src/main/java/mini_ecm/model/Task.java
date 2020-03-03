@@ -41,7 +41,7 @@ public class Task {
 	@ManyToMany(mappedBy = "tasks", fetch = FetchType.EAGER)
 	private List<Employee> doers;
 	
-	@ManyToOne(optional = false, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name = "author_id", nullable = false)
 	private Employee taskAuthor;
 

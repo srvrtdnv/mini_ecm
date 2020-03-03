@@ -28,7 +28,7 @@ public class Company {
 	@Column(name = "physical_adress")
 	private String physicalAd;
 	
-	@OneToOne(optional = false, cascade = CascadeType.ALL)
+	@OneToOne(optional = true, cascade = CascadeType.ALL)
 	@JoinColumn(name = "manager")
 	private Employee manager;
 

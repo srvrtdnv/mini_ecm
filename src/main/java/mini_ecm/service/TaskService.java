@@ -4,8 +4,11 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -42,6 +45,14 @@ public class TaskService {
 	public Response getMyTasks(@Context HttpServletRequest request) {
 		List<Task> res = dao.findByDoer(AuthenticationService.getUserId(request.getSession()));
 		return Response.accepted(res).build();
+	}
+	
+	@POST
+	@Path("/delete/{id}")
+	public void deleteTask(@PathParam("id") Long id) {
+		Task obj = new Task();
+		obj.setId(id);
+		dao.delete(obj);
 	}
 	
 }

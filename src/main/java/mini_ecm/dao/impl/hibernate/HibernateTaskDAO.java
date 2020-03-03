@@ -3,8 +3,10 @@ package mini_ecm.dao.impl.hibernate;
 import java.util.List;
 
 import javax.enterprise.context.RequestScoped;
+import javax.transaction.Transactional;
 
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
 import mini_ecm.dao.TaskDAO;
@@ -30,6 +32,7 @@ public class HibernateTaskDAO implements TaskDAO {
 
 		List<Task> result = (List<Task>) session.createQuery("FROM Task").list();
 		
+		
 		session.close();
 		
 		return result;
@@ -46,6 +49,7 @@ public class HibernateTaskDAO implements TaskDAO {
 		
 		List<Task> result = (List<Task>) qry.list();
 		
+		
 		session.close();
 		
 		return result;
@@ -61,16 +65,24 @@ public class HibernateTaskDAO implements TaskDAO {
 
 		List<Task> result = (List<Task>) qry.list();
 		
+		
 		session.close();
 		
 		return result;
 	}
 
 	@Override
+	@Transactional
 	public void delete(Task task) {
 		Session session = HibernateSessionFactoryHolder.getFactory().openSession();
+
+		task = findById(task.getId());
+		
+		Transaction t = session.beginTransaction();
 		
 		session.delete(task);
+		
+		t.commit();
 		
 		session.close();
 	}
@@ -80,6 +92,7 @@ public class HibernateTaskDAO implements TaskDAO {
 		Session session = HibernateSessionFactoryHolder.getFactory().openSession();
 		
 		session.saveOrUpdate(task);
+		
 		
 		session.close();
 	}

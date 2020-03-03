@@ -17,14 +17,12 @@ public class AjaxServlet extends HttpServlet {
 	
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		System.out.println("TEST PASSED");
 		resp.getWriter().append("asd");
 		
 	}
 	
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		System.out.println("TEST PASSED");
 		super.doPost(req, resp);
 	}
 	

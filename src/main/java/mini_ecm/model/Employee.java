@@ -13,6 +13,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.PreRemove;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -39,15 +41,29 @@ public class Employee {
 	private String position;
 	
 	@JsonIgnore
-	@ManyToMany(fetch = FetchType.EAGER)
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinTable(name = "tasks_employees", 
-			joinColumns = @JoinColumn(name = "task_id"),
-            inverseJoinColumns = @JoinColumn(name = "employee_id"))
+			joinColumns = @JoinColumn(name = "employee_id"),
+            inverseJoinColumns = @JoinColumn(name = "task_id"))
 	private List<Task> tasks;
 	
 	@JsonIgnore
 	@OneToMany(mappedBy = "taskAuthor", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private List<Task> createdMessages;
+	
+	@JsonIgnore
+	@OneToOne(mappedBy = "manager", fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+	private Subvision subvision;
+	
+	@JsonIgnore
+	@OneToOne(mappedBy = "manager", fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+	private Company company;
+	
+	@PreRemove
+	public void preRemove() {
+		if (subvision != null) subvision.setManager(null);
+		if (company != null) company.setManager(null);
+	}
 
 	public String getLastName() {
 		return lastName;
@@ -115,6 +131,26 @@ public class Employee {
 
 	public void setPosition(String position) {
 		this.position = position;
+	}
+
+
+	public Subvision getSubvision() {
+		return subvision;
+	}
+
+
+	public void setSubvision(Subvision subvision) {
+		this.subvision = subvision;
+	}
+
+
+	public Company getCompany() {
+		return company;
+	}
+
+
+	public void setCompany(Company company) {
+		this.company = company;
 	}
 
 

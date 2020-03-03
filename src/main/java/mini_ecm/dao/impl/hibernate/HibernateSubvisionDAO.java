@@ -3,6 +3,8 @@ package mini_ecm.dao.impl.hibernate;
 import java.util.List;
 
 import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 
 import mini_ecm.dao.SubvisionDAO;
 import mini_ecm.model.Employee;
@@ -35,8 +37,16 @@ public class HibernateSubvisionDAO implements SubvisionDAO {
 	@Override
 	public void delete(Subvision subv) {
 		Session session = HibernateSessionFactoryHolder.getFactory().openSession();
-
-		session.delete(subv);
+		
+		Transaction t = session.beginTransaction();
+		
+		Query qry = session.createQuery("DELETE Subvision s WHERE s.id = :id ");
+		
+		qry.setParameter("id", subv.getId());
+		
+		qry.executeUpdate();
+		
+		t.commit();
 		
 		session.close();
 	}

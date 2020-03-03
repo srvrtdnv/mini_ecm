@@ -5,13 +5,13 @@ function createTree(win, Memory, ObjectStoreModel, Tree){
         data: [
             {id: 'root'},
                 { id: 'structure', name:'Structure', type: 'not link', parent: 'root'},
-                { id: 'comps', name:'Companies', parent: 'structure', gridData: {url: "api/company/all", getMethod: setCompanyGridContent, delMethod: deleteCompany}},
-                    { id: 'subvisions', name:'Subvisions', parent: 'comps', gridData: {url: "api/subvision/all", getMethod: setSubvisionGridContent, delMethod: deleteCompany}},
-                        { id: 'empls', name:'Employees', parent: 'subvisions', gridData: {url: "api/employee/all", getMethod: setEmployeeGridContent, delMethod: deleteCompany}},
+                { id: 'comps', name:'Companies', parent: 'structure', gridData: {getAllUrl: "api/company/all", deleteUrl: "api/company/delete", getMethod: setCompanyGridContent, delMethod: deleteItem}},
+                    { id: 'subvisions', name:'Subvisions', parent: 'comps', gridData: {getAllUrl: "api/subvision/all", deleteUrl: "api/subvision/delete", getMethod: setSubvisionGridContent, delMethod: deleteItem}},
+                        { id: 'empls', name:'Employees', parent: 'subvisions', gridData: {getAllUrl: "api/employee/all", deleteUrl: "api/employee/delete", getMethod: setEmployeeGridContent, delMethod: deleteItem}},
                 { id: 'messages', name:'Tasks', type: 'not link', parent: 'root'},
-                    { id: 'allMsgs', name:'All tasks', parent: 'messages', gridData: {url: "api/task/all", getMethod: setTaskGridContent, delMethod: deleteTask}},
-                    { id: 'myMsgs', name:'Created tasks', parent: 'messages', gridData: {url: "api/task/created", getMethod: setTaskGridContent, delMethod: deleteTask}},
-                    { id: 'msgsForMe', name:'My tasks', parent: 'messages', gridData: {url: "api/task/my", getMethod: setTaskGridContent, delMethod: deleteTask}}
+                    { id: 'allMsgs', name:'All tasks', parent: 'messages', gridData: {getAllUrl: "api/task/all", deleteUrl: "api/task/delete", getMethod: setTaskGridContent, delMethod: deleteItem}},
+                    { id: 'myMsgs', name:'Created tasks', parent: 'messages', gridData: {getAllUrl: "api/task/created", deleteUrl: "api/task/delete", getMethod: setTaskGridContent, delMethod: deleteItem}},
+                    { id: 'msgsForMe', name:'My tasks', parent: 'messages', gridData: {getAllUrl: "api/task/my", deleteUrl: "api/task/delete", getMethod: setTaskGridContent, delMethod: deleteItem}}
         ],
         getChildren: function(object){
             return this.query({parent: object.id});
@@ -67,31 +67,17 @@ function addTab(node, request) {
             var div2 = domConstruct.create('div', {id: pane.id + "_gridDiv"});
             
             var btn = new Button({
+                id: pane.id + "_createBtn",
                 label: "Create new",
                 onclick: function() {
                 }
-            }, pane.id + "_createBtn");
-            btn.startup();
-            
-            var updBtn = new Button({
-                label: "Update",
-                style: "display: none;",
-                onclick: pane.delMethod
-            }, pane.id + "_updateBtn");
-            btn.startup();
-            
-            var delBtn = new Button({
-                label: "Delete",
-                style: "display: none;",
-                onclick: pane.delMethod
-            }, pane.id + "_deleteBtn");
+            });
             btn.startup();
             
             pane.set('content', [div1, div2]);
             
+            
             domConstruct.place(btn.domNode, div1);
-            domConstruct.place(delBtn.domNode, div1);
-            domConstruct.place(updBtn.domNode, div1);
             //div1.appendChild(btn);
             //pane.setContent(btn);
             //pane.set("href", "test_ajax");
@@ -117,7 +103,7 @@ function addTab(node, request) {
 
 function setCompanyGridContent() {
     if (this.count == 1) return;
-    var tab = this;
+    var pane = this;
     require([
         "dojox/grid/DataGrid",
         "dojo/store/Memory",
@@ -126,13 +112,14 @@ function setCompanyGridContent() {
         "dojo/domReady!"
     ], function(DataGrid, Memory, ObjectStore, request) {
                 var dataStore, grid;
-                request.get(tab.gridData.url, {
+                request.get(pane.gridData.getAllUrl, {
                     handleAs: 'json'
                 }).then(
                     function(resp) {
                         var gridData = {identifier: 'id', items: resp};
                         dataStore = new ObjectStore({ objectStore:new Memory({ data: gridData.items }) });
                         grid = new DataGrid({
+                            id: pane.id + "_grid",
                             store: dataStore,
                             query: { id: "*" },
                             queryOptions: {},
@@ -143,12 +130,15 @@ function setCompanyGridContent() {
                                 { name: 'Legal adress', field: 'legalAd', width: '30%' },
                                 { name: 'Manager', field: 'manager', width: '16%',
                                   formatter: function(manager) {
-                                      return manager.lastName + " " + manager.firstName + " " + manager.middleName;
+                                      var result = "Vacant";
+                                      if (manager) result = manager.lastName + " " + manager.firstName + " " + manager.middleName;
+                                      return result;
                                   }
                                 }
                             ]
-                        }).placeAt(tab);
+                        }).placeAt(pane);
                         grid.startup();
+                        grid.connect(grid, 'onRowClick', showButtons);
                     },
                     function(error) {
                         console.log("not good");
@@ -161,7 +151,7 @@ function setCompanyGridContent() {
 
 function setSubvisionGridContent() {
     if (this.count == 1) return;
-    var tab = this;
+    var pane = this;
     require([
         "dojox/grid/DataGrid",
         "dojo/store/Memory",
@@ -170,13 +160,14 @@ function setSubvisionGridContent() {
         "dojo/domReady!"
     ], function(DataGrid, Memory, ObjectStore, request) {
                 var dataStore, grid;
-                request.get(tab.gridData.url, {
+                request.get(pane.gridData.getAllUrl, {
                     handleAs: 'json'
                 }).then(
                     function(resp) {
                         var gridData = {identifier: 'id', items: resp};
                         dataStore = new ObjectStore({ objectStore:new Memory({ data: gridData.items }) });
                         grid = new DataGrid({
+                            id: pane.id + "_grid",
                             store: dataStore,
                             query: { id: "*" },
                             queryOptions: {},
@@ -186,12 +177,15 @@ function setSubvisionGridContent() {
                                 { name: 'Contact data', field: 'phNumber', width: '30%' },
                                 { name: 'Manager', field: 'manager', width: '35%',
                                   formatter: function(manager) {
-                                      return manager.lastName + " " + manager.firstName + " " + manager.middleName;
+                                      var result = "Vacant";
+                                      if (manager) result = manager.lastName + " " + manager.firstName + " " + manager.middleName;
+                                      return result;
                                   }
                                 }
                             ]
-                        }).placeAt(tab);
+                        }).placeAt(pane);
                         grid.startup();
+                        grid.connect(grid, 'onRowClick', showButtons);
                     },
                     function(error) {
                         console.log("not good");
@@ -204,7 +198,7 @@ function setSubvisionGridContent() {
 
 function setEmployeeGridContent() {
     if (this.count == 1) return;
-    var tab = this;
+    var pane = this;
     require([
         "dojox/grid/DataGrid",
         "dojo/store/Memory",
@@ -213,13 +207,14 @@ function setEmployeeGridContent() {
         "dojo/domReady!"
     ], function(DataGrid, Memory, ObjectStore, request) {
                 var dataStore, grid;
-                request.get(tab.gridData.url, {
+                request.get(pane.gridData.getAllUrl, {
                     handleAs: 'json'
                 }).then(
                     function(resp) {
                         var gridData = {identifier: 'id', items: resp};
                         dataStore = new ObjectStore({ objectStore:new Memory({ data: gridData.items }) });
                         grid = new DataGrid({
+                            id: pane.id + "_grid",
                             store: dataStore,
                             query: { id: "*" },
                             queryOptions: {},
@@ -230,8 +225,10 @@ function setEmployeeGridContent() {
                                 { name: 'Middle name', field: 'middleName', width: '24%' },
                                 { name: 'Position', field: 'position', width: '24%' }
                             ]
-                        }).placeAt(tab);
+                        }).placeAt(pane);
                         grid.startup();
+                        grid.connect(grid, 'onRowClick', showButtons);
+                        grid.connect(grid, 'onDeselected', hideButtons);
                     },
                     function(error) {
                         console.log("not good");
@@ -244,7 +241,7 @@ function setEmployeeGridContent() {
 
 function setTaskGridContent(elem, event, handler) {
     if (this.count == 1) return;
-    var tab = this;
+    var pane = this;
     require([
         "dojox/grid/DataGrid",
         "dojo/store/Memory",
@@ -257,13 +254,14 @@ function setTaskGridContent(elem, event, handler) {
     ], function(DataGrid, Memory, ObjectStore, request, registry, query, domConstruct) {
                 console.log(query("#allMsgs_buttonDiv"));
                 var dataStore, grid;
-                request.get(tab.gridData.url, {
+                request.get(pane.gridData.getAllUrl, {
                     handleAs: 'json'
                 }).then(
                     function(resp) {
                         var gridData = {identifier: 'id', items: resp};
                         dataStore = new ObjectStore({ objectStore:new Memory({ data: gridData.items }) });
                         grid = new DataGrid({
+                            id: pane.id + "_grid",
                             store: dataStore,
                             query: { id: "*" },
                             queryOptions: {},
@@ -297,7 +295,7 @@ function setTaskGridContent(elem, event, handler) {
                                 },
                                 { name: 'Time', field: 'executionTime', width: '10%' },
                             ]
-                        }).placeAt(tab);
+                        }).placeAt(pane);
                         grid.startup();
                         grid.connect(grid, 'onRowClick', showButtons);
                     },
@@ -310,19 +308,32 @@ function setTaskGridContent(elem, event, handler) {
     this.count = 1;
 }
 
-function deleteCompany() {
+function deleteItem(evt, a, b) {
     
-}
-
-function deleteSubvision() {
+    var btn = this;
     
-}
-
-function deleteEmployee() {
-    
-}
-
-function deleteTask() {
+    require([
+        "dojo/request",
+        "dojo/query",
+        "dijit/registry",
+        "dojo/dom-style",
+        "dojo/dom-construct",
+        "dijit/form/Button",
+        "dojo/NodeList-traverse"
+    ], function(request, query, registry, domStyle, domConstruct, Button) {
+        var paneId = query(btn.domNode).closest('.pane')[0].id;
+        var pane = registry.byId(paneId);
+        var grid = registry.byId(paneId + "_grid");
+        var row = grid.selection.getSelected()[0];
+        
+        request.post(pane.gridData.deleteUrl + "/" + row.id).then(function() {
+            grid.store.deleteItem(row);
+            alert("Task have been deleted.");
+        });
+        
+        
+        console.log(grid.selection.getSelected()[0].id);
+    })
     
 }
 
@@ -330,20 +341,42 @@ function showButtons(evt) {
     
     require([
         "dojo/query",
+        "dijit/registry",
         "dojo/dom-style",
-        "dojo/registry",
-        "dojo/NodeList-traverse",
-        "dojo/domReady!"
-    ], function(query, domStyle, registry) {
+        "dojo/dom-construct",
+        "dijit/form/Button",
+        "dojo/NodeList-traverse"
+    ], function(query, registry, domStyle, domConstruct, Button) {
         var paneId = query(evt.grid.domNode).closest('.pane')[0].id;
-        console.log(query("#" + paneId + "_deleteBtn"));
-        domStyle.set(query("#" + paneId + "_deleteBtn"), 'display', 'block');
-        domStyle.set(query("#" + paneId + "_updateBtn"), 'display', 'block');
+        var pane = registry.byId(paneId);
         
-        console.log(evt);
-        console.log(query('.pane')[0].id);
-        console.log(query(evt.grid.domNode).closest('.pane'));
+        if (!registry.byId(paneId + "_updateBtn")) {
+            var updBtn = new Button({
+                id: pane.id + "_updateBtn",
+                label: "Update",
+                onClick: function() {console.log(this);}
+            });
+            updBtn.startup();
+            domConstruct.place(updBtn.domNode, dojo.byId(paneId + "_buttonDiv"));
+        }
+        
+        if (!registry.byId(paneId + "_deleteBtn")) {
+            var delBtn = new Button({
+                id: pane.id + "_deleteBtn",
+                label: "Delete",
+                onClick: pane.gridData.delMethod
+            });
+            delBtn.startup();
+            domConstruct.place(delBtn.domNode, dojo.byId(paneId + "_buttonDiv"));
+        }
     })
+}
+
+
+function hideButtons(a, b) {
+    
+   
+    
 }
 
 

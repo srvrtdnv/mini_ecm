@@ -53,7 +53,7 @@ public class Servlet extends HttpServlet {
 		subv.setPhNumber("+74953626961");
 		
 		
-		doHibernateFindTaskByAuthorTest();
+		doHibernateTest(subv);
 		
 		req.getRequestDispatcher("/views/dojo_view.html").forward(req, resp);
 	}
@@ -80,7 +80,7 @@ public class Servlet extends HttpServlet {
 		transaction.commit();
 		session.close();
 		
-		System.out.println(new HibernateTaskDAO().findById(4L).getTaskAuthor().getFirstName());
+		//System.out.println(new HibernateTaskDAO().findById(4L).getTaskAuthor().getFirstName());
 	}
 	
 	@Override

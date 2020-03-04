@@ -34,7 +34,7 @@ public class HibernateCompanyDAO implements CompanyDAO {
 	}
 
 	@Override
-	public void delete(Company comp) {
+	public int delete(Company comp) {
 Session session = HibernateSessionFactoryHolder.getFactory().openSession();
 		
 		Transaction t = session.beginTransaction();
@@ -48,15 +48,34 @@ Session session = HibernateSessionFactoryHolder.getFactory().openSession();
 		t.commit();
 		
 		session.close();
+		
+		return 1;
 	}
 
 	@Override
-	public void saveOrUpdate(Company comp) {
+	public int saveOrUpdate(Company comp) {
 		Session session = HibernateSessionFactoryHolder.getFactory().openSession();
 		
-		session.saveOrUpdate(comp);
+		int result = -1;
 		
-		session.close();
+		try {
+		
+			Transaction trans = session.beginTransaction();
+			
+			session.saveOrUpdate(comp);
+			
+			session.flush();
+			
+			trans.commit();
+			
+			result = 1;
+			
+		}finally {
+		
+			session.close();
+		
+		}
+		return result;
 	}
 
 }

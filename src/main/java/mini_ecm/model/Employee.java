@@ -1,6 +1,7 @@
 package mini_ecm.model;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -41,11 +42,11 @@ public class Employee {
 	private String position;
 	
 	@JsonIgnore
-	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
 	@JoinTable(name = "tasks_employees", 
 			joinColumns = @JoinColumn(name = "employee_id"),
             inverseJoinColumns = @JoinColumn(name = "task_id"))
-	private List<Task> tasks;
+	private Set<Task> tasks;
 	
 	@JsonIgnore
 	@OneToMany(mappedBy = "taskAuthor", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -114,12 +115,12 @@ public class Employee {
 		this.createdMessages = createdMessages;
 	}
 	
-	public List<Task> getTasks() {
+	public Set<Task> getTasks() {
 		return tasks;
 	}
 
 
-	public void setTasks(List<Task> tasks) {
+	public void setTasks(Set<Task> tasks) {
 		this.tasks = tasks;
 	}
 
@@ -153,6 +154,20 @@ public class Employee {
 		this.company = company;
 	}
 
+	
+	@Override
+	public boolean equals(Object empl) {
+		if (empl == null) return false;
+		if (empl.getClass() != Employee.class) return false;
+		if (this.id.equals(((Employee) empl).getId())) return true;
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		if (id == null) return 0;
+		return (int) id.longValue();
+	}
 
 	@Override
 	public String toString() {

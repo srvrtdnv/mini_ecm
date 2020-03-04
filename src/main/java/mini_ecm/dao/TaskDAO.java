@@ -11,7 +11,7 @@ public interface TaskDAO {
 	public List<Task> findAll();
 	public List<Task> findByAuthor(Long author);
 	public List<Task> findByDoer(Long doer);
-	public void delete(Task task);
-	public void saveOrUpdate(Task task);
+	public int delete(Task task);
+	public int saveOrUpdate(Task task);
 
 }

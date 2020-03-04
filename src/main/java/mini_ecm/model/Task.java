@@ -1,6 +1,7 @@
 package mini_ecm.model;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -39,7 +40,7 @@ public class Task {
 	private boolean isControlled;
 	
 	@ManyToMany(mappedBy = "tasks", fetch = FetchType.EAGER)
-	private List<Employee> doers;
+	private Set<Employee> doers;
 	
 	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name = "author_id", nullable = false)
@@ -77,11 +78,11 @@ public class Task {
 		this.subject = subject;
 	}
 
-	public List<Employee> getDoers() {
+	public Set<Employee> getDoers() {
 		return doers;
 	}
 
-	public void setDoers(List<Employee> doers) {
+	public void setDoers(Set<Employee> doers) {
 		this.doers = doers;
 	}
 
@@ -107,6 +108,20 @@ public class Task {
 
 	public void setControlled(boolean isControlled) {
 		this.isControlled = isControlled;
+	}
+	
+	@Override
+	public boolean equals(Object task) {
+		if (task == null) return false;
+		if (task.getClass() != Task.class) return false;
+		if (this.id.equals(((Task) task).getId())) return true;
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		if (id == null) return 0;
+		return (int) id.longValue();
 	}
 
 	@Override

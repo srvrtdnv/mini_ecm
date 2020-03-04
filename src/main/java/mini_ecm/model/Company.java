@@ -71,6 +71,21 @@ public class Company {
 		this.name = name;
 	}
 	
+
+	@Override
+	public boolean equals(Object comp) {
+		if (comp == null) return false;
+		if (comp.getClass() != Company.class) return false;
+		if (this.id.equals(((Company) comp).getId())) return true;
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		if (id == null) return 0;
+		return (int) id.longValue();
+	}
+	
 	@Override
 	public String toString() {
 		return name;

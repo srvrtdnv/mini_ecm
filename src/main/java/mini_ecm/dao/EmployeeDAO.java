@@ -9,7 +9,7 @@ public interface EmployeeDAO {
 	
 	public Employee findById(Long id);
 	public List<Employee> findAll();
-	public void delete(Employee empl);
-	public void saveOrUpdate(Employee empl);
+	public int delete(Employee empl);
+	public int saveOrUpdate(Employee empl);
 
 }

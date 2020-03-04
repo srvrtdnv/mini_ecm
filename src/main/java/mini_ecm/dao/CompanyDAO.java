@@ -8,7 +8,7 @@ public interface CompanyDAO {
 	
 	public Company findById(Long id);
 	public List<Company> findAll();
-	public void delete(Company comp);
-	public void saveOrUpdate(Company comp);
+	public int delete(Company comp);
+	public int saveOrUpdate(Company comp);
 	
 }

@@ -10,6 +10,7 @@ import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
 import mini_ecm.dao.TaskDAO;
+import mini_ecm.model.Employee;
 import mini_ecm.model.Task;
 
 
@@ -18,8 +19,14 @@ public class HibernateTaskDAO implements TaskDAO {
 	@Override
 	public Task findById(Long id) {
 		Session session = HibernateSessionFactoryHolder.getFactory().openSession();
-
+		
+		Transaction trans = session.beginTransaction();
+		
 		Task result = session.get(Task.class, id);
+		
+		session.flush();
+		
+		trans.commit();
 		
 		session.close();
 		
@@ -73,7 +80,7 @@ public class HibernateTaskDAO implements TaskDAO {
 
 	@Override
 	@Transactional
-	public void delete(Task task) {
+	public int delete(Task task) {
 		Session session = HibernateSessionFactoryHolder.getFactory().openSession();
 
 		task = findById(task.getId());
@@ -85,16 +92,37 @@ public class HibernateTaskDAO implements TaskDAO {
 		t.commit();
 		
 		session.close();
+		
+		return 1;
 	}
 
 	@Override
-	public void saveOrUpdate(Task task) {
+	public int saveOrUpdate(Task task) {
 		Session session = HibernateSessionFactoryHolder.getFactory().openSession();
 		
-		session.saveOrUpdate(task);
+		Transaction trans = session.beginTransaction();
 		
-		
+		int result = -1;
+		try {
+			
+			session.saveOrUpdate(task);
+			
+			//autoupdating many-to-many works only with cascade all
+			for (Employee doer : task.getDoers()) {
+				session.merge(doer);
+			}
+			
+			session.flush();
+			
+			trans.commit();
+			
+			result = 1;
+			
+		} finally {
+		}
 		session.close();
+		
+		return result;
 	}
 
 }

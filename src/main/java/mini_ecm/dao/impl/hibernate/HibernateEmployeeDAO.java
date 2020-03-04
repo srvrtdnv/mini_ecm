@@ -17,9 +17,14 @@ public class HibernateEmployeeDAO implements EmployeeDAO {
 	public Employee findById(Long id) {
 		Session session = HibernateSessionFactoryHolder.getFactory().openSession();
 		
-		Employee result = session.get(Employee.class, id);
+		Employee result;
 		
-		session.close();
+		try {
+			result = session.get(Employee.class, id);
+		}
+		finally {
+			session.close();
+		}
 		
 		return result;
 	}
@@ -36,39 +41,58 @@ public class HibernateEmployeeDAO implements EmployeeDAO {
 	}
 
 	@Override
-	public void delete(Employee empl) {
-		Session session = HibernateSessionFactoryHolder.getFactory().openSession();
-
+	public int delete(Employee empl) {
 		empl = findById(empl.getId());
 		
-		Subvision subv = empl.getSubvision();
-		Company comp = empl.getCompany();
+		Session session = HibernateSessionFactoryHolder.getFactory().openSession();
 		
-		Transaction t = session.beginTransaction();
+		if (empl != null) {
+			Subvision subv = empl.getSubvision();
+			Company comp = empl.getCompany();
+			
+			Transaction t = session.beginTransaction();
+			
+			session.delete(empl);
+			
+			if (subv != null) session.merge(subv);
+			if (comp != null) session.merge(comp);
+	
+			session.flush();
+			
+			t.commit();
+			
+			session.close();
+			
+			return 1;
+		}
 		
-		System.out.println(session.contains(empl));
-		
-		session.delete(empl);
-		
-		
-		if (subv != null) session.merge(subv);
-		if (comp != null) session.merge(comp);
-		
-
-		session.flush();
-		
-		t.commit();
-		
-		session.close();;
+		return -1;
 	}
 
 	@Override
-	public void saveOrUpdate(Employee empl) {
-		Session session = HibernateSessionFactoryHolder.getFactory().openSession();
+	public int saveOrUpdate(Employee empl) {
+Session session = HibernateSessionFactoryHolder.getFactory().openSession();
 		
-		session.saveOrUpdate(empl);
+		int result = -1;
+		
+		try {
+		
+			Transaction trans = session.beginTransaction();
+			
+			session.saveOrUpdate(empl);
+			
+			session.flush();
+			
+			trans.commit();
+			
+			result = 1;
+			
+		}finally {
+		
+		}
 		
 		session.close();
+		return result;
 	}
 
 }

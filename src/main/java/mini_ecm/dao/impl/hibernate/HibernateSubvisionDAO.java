@@ -35,7 +35,7 @@ public class HibernateSubvisionDAO implements SubvisionDAO {
 	}
 
 	@Override
-	public void delete(Subvision subv) {
+	public int delete(Subvision subv) {
 		Session session = HibernateSessionFactoryHolder.getFactory().openSession();
 		
 		Transaction t = session.beginTransaction();
@@ -49,15 +49,34 @@ public class HibernateSubvisionDAO implements SubvisionDAO {
 		t.commit();
 		
 		session.close();
+		
+		return 1;
 	}
 
 	@Override
-	public void saveOrUpdate(Subvision subv) {
-		Session session = HibernateSessionFactoryHolder.getFactory().openSession();
+	public int saveOrUpdate(Subvision subv) {
+Session session = HibernateSessionFactoryHolder.getFactory().openSession();
 		
-		session.saveOrUpdate(subv);
+		int result = -1;
 		
-		session.close();
+		try {
+		
+			Transaction trans = session.beginTransaction();
+			
+			session.saveOrUpdate(subv);
+			
+			session.flush();
+			
+			trans.commit();
+			
+			result = 1;
+			
+		}finally {
+		
+			session.close();
+		
+		}
+		return result;
 	}
 
 }

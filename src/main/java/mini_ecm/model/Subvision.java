@@ -62,6 +62,20 @@ public class Subvision {
 	}
 	
 	@Override
+	public boolean equals(Object subv) {
+		if (subv == null) return false;
+		if (subv.getClass() != Subvision.class) return false;
+		if (this.id.equals(((Subvision) subv).getId())) return true;
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		if (id == null) return 0;
+		return (int) id.longValue();
+	}
+	
+	@Override
 	public String toString() {
 		return name;
 	}

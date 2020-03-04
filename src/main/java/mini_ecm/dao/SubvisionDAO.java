@@ -9,7 +9,7 @@ public interface SubvisionDAO {
 	
 	public Subvision findById(Long id);
 	public List<Subvision> findAll();
-	public void delete(Subvision subv);
-	public void saveOrUpdate(Subvision subv);
+	public int delete(Subvision subv);
+	public int saveOrUpdate(Subvision subv);
 
 }

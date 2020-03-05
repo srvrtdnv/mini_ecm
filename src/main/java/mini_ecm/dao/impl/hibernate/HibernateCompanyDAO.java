@@ -15,9 +15,17 @@ public class HibernateCompanyDAO implements CompanyDAO {
 	public Company findById(Long id) {
 		Session session = HibernateSessionFactoryHolder.getFactory().openSession();
 		
-		Company result = session.get(Company.class, id);
+		Company result;
 		
-		session.close();
+		try {
+		
+			result = session.get(Company.class, id);
+		
+		} finally {
+		
+			session.close();
+		
+		}
 		
 		return result;
 	}
@@ -26,30 +34,49 @@ public class HibernateCompanyDAO implements CompanyDAO {
 	public List<Company> findAll() {
 		Session session = HibernateSessionFactoryHolder.getFactory().openSession();
 		
-		List<Company> result = (List<Company>) session.createQuery("FROM Company").list();
+		List<Company> result = null;
 		
-		session.close();
+		try {
+		
+			result = (List<Company>) session.createQuery("FROM Company").list();
+		
+		} finally {
+			
+			session.close();
+			
+		}
 		
 		return result;
 	}
 
 	@Override
 	public int delete(Company comp) {
-Session session = HibernateSessionFactoryHolder.getFactory().openSession();
 		
-		Transaction t = session.beginTransaction();
+		Session session = HibernateSessionFactoryHolder.getFactory().openSession();
 		
-		Query qry = session.createQuery("DELETE Company c WHERE c.id = :id ");
+		int result = -1;
 		
-		qry.setParameter("id", comp.getId());
+		try {
 		
-		qry.executeUpdate();
+			Transaction t = session.beginTransaction();
+			
+			Query qry = session.createQuery("DELETE Company c WHERE c.id = :id ");
+			
+			qry.setParameter("id", comp.getId());
+			
+			qry.executeUpdate();
+			
+			t.commit();
+			
+			result = 1;
 		
-		t.commit();
+		} finally {
 		
-		session.close();
+			session.close();
 		
-		return 1;
+		}
+		
+		return result;
 	}
 
 	@Override
@@ -70,10 +97,10 @@ Session session = HibernateSessionFactoryHolder.getFactory().openSession();
 			
 			result = 1;
 			
-		}finally {
+		} finally {
 		
 			session.close();
-		
+			
 		}
 		return result;
 	}

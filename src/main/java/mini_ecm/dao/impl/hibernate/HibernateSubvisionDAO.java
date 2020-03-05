@@ -15,10 +15,18 @@ public class HibernateSubvisionDAO implements SubvisionDAO {
 	@Override
 	public Subvision findById(Long id) {
 		Session session = HibernateSessionFactoryHolder.getFactory().openSession();
+		
+		Subvision result;
+		
+		try {
+		
+			result = session.get(Subvision.class, id);
+		
+		} finally {
 
-		Subvision result = session.get(Subvision.class, id);
-
-		session.close();
+			session.close();
+		
+		}
 		
 		return result;
 	}
@@ -27,9 +35,17 @@ public class HibernateSubvisionDAO implements SubvisionDAO {
 	public List<Subvision> findAll() {
 		Session session = HibernateSessionFactoryHolder.getFactory().openSession();
 		
-		List<Subvision> result = (List<Subvision>) session.createQuery("FROM Subvision").list();
+		List<Subvision> result;
 		
-		session.close();
+		try {
+		
+			result = (List<Subvision>) session.createQuery("FROM Subvision").list();
+		
+		} finally {
+			
+			session.close();
+		
+		}
 		
 		return result;
 	}
@@ -38,19 +54,29 @@ public class HibernateSubvisionDAO implements SubvisionDAO {
 	public int delete(Subvision subv) {
 		Session session = HibernateSessionFactoryHolder.getFactory().openSession();
 		
-		Transaction t = session.beginTransaction();
+		int result = -1;
 		
-		Query qry = session.createQuery("DELETE Subvision s WHERE s.id = :id ");
+		try {
+			
+			Transaction t = session.beginTransaction();
+			
+			Query qry = session.createQuery("DELETE Subvision s WHERE s.id = :id ");
+			
+			qry.setParameter("id", subv.getId());
+			
+			qry.executeUpdate();
+			
+			t.commit();
+			
+			result = 1;
 		
-		qry.setParameter("id", subv.getId());
+		} finally {
 		
-		qry.executeUpdate();
+			session.close();
 		
-		t.commit();
+		}
 		
-		session.close();
-		
-		return 1;
+		return result;
 	}
 
 	@Override
@@ -71,11 +97,12 @@ Session session = HibernateSessionFactoryHolder.getFactory().openSession();
 			
 			result = 1;
 			
-		}finally {
+		} finally {
 		
 			session.close();
 		
 		}
+		
 		return result;
 	}
 

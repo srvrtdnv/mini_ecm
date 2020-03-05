@@ -32,10 +32,18 @@ public class HibernateEmployeeDAO implements EmployeeDAO {
 	@Override
 	public List<Employee> findAll() {
 		Session session = HibernateSessionFactoryHolder.getFactory().openSession();
-
-		List<Employee> result = (List<Employee>) session.createQuery("FROM Employee").list();
 		
-		session.close();
+		List<Employee> result = null;
+		
+		try {
+		
+			result = (List<Employee>) session.createQuery("FROM Employee").list();
+		
+		} finally {
+		
+			session.close();
+		
+		}
 		
 		return result;
 	}
@@ -46,27 +54,37 @@ public class HibernateEmployeeDAO implements EmployeeDAO {
 		
 		Session session = HibernateSessionFactoryHolder.getFactory().openSession();
 		
+		int result = -1;
+		
 		if (empl != null) {
+			
 			Subvision subv = empl.getSubvision();
 			Company comp = empl.getCompany();
 			
-			Transaction t = session.beginTransaction();
+			try {
 			
-			session.delete(empl);
+				Transaction t = session.beginTransaction();
+				
+				session.delete(empl);
+				
+				if (subv != null) session.merge(subv);
+				if (comp != null) session.merge(comp);
+		
+				session.flush();
+				
+				t.commit();
+				
+				result = 1;
 			
-			if (subv != null) session.merge(subv);
-			if (comp != null) session.merge(comp);
-	
-			session.flush();
+			} finally {
 			
-			t.commit();
+				session.close();
 			
-			session.close();
+			}
 			
-			return 1;
 		}
 		
-		return -1;
+		return result;
 	}
 
 	@Override
@@ -87,11 +105,12 @@ Session session = HibernateSessionFactoryHolder.getFactory().openSession();
 			
 			result = 1;
 			
-		}finally {
-		
+		} finally {
+
+			session.close();
+			
 		}
 		
-		session.close();
 		return result;
 	}
 

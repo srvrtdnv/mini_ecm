@@ -20,15 +20,17 @@ public class HibernateTaskDAO implements TaskDAO {
 	public Task findById(Long id) {
 		Session session = HibernateSessionFactoryHolder.getFactory().openSession();
 		
-		Transaction trans = session.beginTransaction();
+		Task result;
 		
-		Task result = session.get(Task.class, id);
+		try {
+			
+			result = session.get(Task.class, id);
 		
-		session.flush();
+		} finally {
 		
-		trans.commit();
+			session.close();
 		
-		session.close();
+		}
 		
 		return result;
 	}
@@ -36,11 +38,18 @@ public class HibernateTaskDAO implements TaskDAO {
 	@Override
 	public List<Task> findAll() {
 		Session session = HibernateSessionFactoryHolder.getFactory().openSession();
+		
+		List<Task> result;
+		
+		try {
+		
+			result = (List<Task>) session.createQuery("FROM Task").list();
+		
+		} finally {
 
-		List<Task> result = (List<Task>) session.createQuery("FROM Task").list();
-		
-		
-		session.close();
+			session.close();
+			
+		}
 		
 		return result;
 	}
@@ -54,10 +63,17 @@ public class HibernateTaskDAO implements TaskDAO {
 		
 		qry.setParameter("author", author);
 		
-		List<Task> result = (List<Task>) qry.list();
+		List<Task> result;
 		
+		try {
 		
-		session.close();
+			result = (List<Task>) qry.list();
+		
+		} finally {
+		
+			session.close();
+		
+		}
 		
 		return result;
 	}
@@ -69,11 +85,18 @@ public class HibernateTaskDAO implements TaskDAO {
 		Query qry = session.createQuery("FROM Task t JOIN t.doers d WHERE d.id = :doerId ");
 		
 		qry.setParameter("doerId", doerId);
-
-		List<Task> result = (List<Task>) qry.list();
 		
+		List<Task> result;
 		
-		session.close();
+		try {
+		
+			result = (List<Task>) qry.list();
+		
+		} finally {
+		
+			session.close();
+		
+		}
 		
 		return result;
 	}
@@ -85,15 +108,25 @@ public class HibernateTaskDAO implements TaskDAO {
 
 		task = findById(task.getId());
 		
-		Transaction t = session.beginTransaction();
+		int result = -1;
 		
-		session.delete(task);
+		try {
 		
-		t.commit();
+			Transaction t = session.beginTransaction();
+			
+			session.delete(task);
+			
+			t.commit();
+			
+			result = 1;
 		
-		session.close();
+		} finally {
 		
-		return 1;
+			session.close();
+		
+		}
+		
+		return result;
 	}
 
 	@Override
@@ -119,8 +152,10 @@ public class HibernateTaskDAO implements TaskDAO {
 			result = 1;
 			
 		} finally {
+			
+			session.close();
+			
 		}
-		session.close();
 		
 		return result;
 	}

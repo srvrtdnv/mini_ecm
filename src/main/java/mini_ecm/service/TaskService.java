@@ -103,7 +103,7 @@ public class TaskService {
 	
 	@POST
 	@Path("/update/{id}")
-	public Response updTask(@PathParam("id") Long id, @FormParam("subject") String subject, @FormParam("text") String text, @FormParam("doers") String doers, @FormParam("exTime") String exTime, @FormParam("controlled") boolean isControlled, String s) {
+	public Response updTask(@PathParam("id") Long id, @FormParam("subject") String subject, @FormParam("text") String text, @FormParam("doers") String doers, @FormParam("exTime") String exTime, @FormParam("controlled") boolean isControlled, @FormParam("done") boolean isDone, String s) {
 		
 		Task task = taskDao.findById(id);
 		
@@ -137,7 +137,7 @@ public class TaskService {
 		task.setText(text);
 		task.setExecutionTime(exTime);
 		task.setControlled(isControlled);
-		task.setDone(true);
+		task.setDone(isDone);
 		task.setDoers(doersList);
 		
 		int result = taskDao.saveOrUpdate(task);

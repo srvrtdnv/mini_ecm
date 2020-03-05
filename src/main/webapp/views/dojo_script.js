@@ -113,7 +113,7 @@ function setCompanyGridContent() {
                         grid.connect(grid, 'onDblClick', updCompany);
                     },
                     function(error) {
-                        console.log("not good");
+                        alert("Error");
                     }
                 )
             }
@@ -208,7 +208,7 @@ function setEmployeeGridContent() {
                         grid.connect(grid, 'onDblClick', updEmployee);
                     },
                     function(error) {
-                        console.log("not good");
+                        console.log("Error");
                     }
                 )
             }
@@ -229,7 +229,6 @@ function setTaskGridContent(elem, event, handler) {
         "dojo/dom-construct",
         "dojo/domReady!"
     ], function(DataGrid, Memory, ObjectStore, request, registry, query, domConstruct) {
-                console.log(query("#allMsgs_buttonDiv"));
                 var dataStore, grid;
                 request.get(pane.paneData.getAllUrl, {
                     handleAs: 'json'
@@ -281,7 +280,7 @@ function setTaskGridContent(elem, event, handler) {
                         grid.connect(grid, 'onDblClick', updTask);
                     },
                     function(error) {
-                        console.log("not good");
+                        console.log("Error");
                     }
                 )
             }
@@ -405,13 +404,15 @@ function updTask() {
     
     var btn = this;
         require([
-            "dijit/registry", 
+            "dijit/registry",
+            "dojo/query",
             "dijit/layout/ContentPane",
             "dijit/form/Button",
+            "dijit/form/RadioButton",
             "dijit/form/ValidationTextBox",  
             "dijit/form/Form", 
             "dojo/dom-construct"
-        ], function(registry, ContentPane, Button, ValidationTextBox, Form, domConstruct){
+        ], function(registry, query, ContentPane, Button, RadioButton, ValidationTextBox, Form, domConstruct){
             
             if (registry.byId("updateTask")) return;
             
@@ -428,6 +429,7 @@ function updTask() {
             var text = row.text;
             var taskAuthorId = row.taskAuthor.id;
             var controlled = row.controlled;
+            var done = row.done;
             var doers = "";
             
             for(var i = 0; i < row.doers.length; i++) {
@@ -439,7 +441,8 @@ function updTask() {
             
             var time = row.executionTime;
             
-            form.setValues({subject: subject, text: text, doers: doers, controlled: "" + controlled, exTime: time});
+            form.setValues({subject: subject, text: text, doers: doers, controlled: "" + controlled, exTime: time, done: "" + done});
+            
             
             form.placeAt(pane);
             
@@ -832,6 +835,7 @@ function createTaskForm(pane, url, formId) {
             var exTime = domConstruct.create('div', {id: pane.id + "_exTime"});
             var labelControlled = domConstruct.create('label', {innerHTML: 'Controlled:'});
             var controlled = domConstruct.create('div', {id: pane.id + "_controlled"});
+            var done = domConstruct.create('div', {id: pane.id + "_done"});
             var btns = domConstruct.create('div', {id: pane.id + "_btns"});
             
             form = new Form({
@@ -839,6 +843,7 @@ function createTaskForm(pane, url, formId) {
                 id: formId
             });
             
+        
             domConstruct.place(subj, form.domNode);
             domConstruct.place(text, form.domNode);
             domConstruct.place(doers, form.domNode);
@@ -918,6 +923,37 @@ function createTaskForm(pane, url, formId) {
             domConstruct.place(labelNo, controlled);
             domConstruct.place(confirm.domNode, btns);
             
+        
+            if (formId === "updateTsk") {
+                
+                var labelDone = domConstruct.create('label', {innerHTML: 'Done:'});
+                
+                var doneRBYes = new RadioButton({
+                    id: form.id + "doneyesRB",
+                    value: 'true',
+                    name: 'done',
+                    showLabel: true
+                });
+                var labelYes = domConstruct.create('label', {for: form.id + "doneyesRB", innerHTML: 'Yes '});
+
+                var doneRBNo = new RadioButton({
+                    id: form.id + "donenoRB",
+                    value: 'false',
+                    checked: true,
+                    name: 'done'
+                });
+                var labelNo = domConstruct.create('label', {for: form.id + "donenoRB", innerHTML: 'No'});
+
+                domConstruct.place(domConstruct.create('br'), controlled);
+                domConstruct.place(labelDone, controlled);
+                domConstruct.place(domConstruct.create('br'), controlled);
+                domConstruct.place(doneRBYes.domNode, controlled);
+                domConstruct.place(labelYes, controlled);
+                domConstruct.place(doneRBNo.domNode, controlled);
+                domConstruct.place(labelNo, controlled);
+            
+            }
+        
             controlledRBYes.startup();
             
             form.startup();
@@ -956,7 +992,28 @@ function createButtons(evt) {
             var delBtn = new Button({
                 id: pane.id + "_deleteBtn",
                 label: "Delete",
-                onClick: pane.paneData.delMethod
+                delMethod: pane.paneData.delMethod,
+                onClick: function() {
+                
+                    var btn = this;
+                
+                    require(["dijit/ConfirmDialog", "dojo/domReady!"], function(ConfirmDialog){
+                       
+                        var myDialog = new ConfirmDialog({
+                            btn: btn,
+                            title: "Confirm your choise.",
+                            content: "Are you sure to delete selected items?",
+                            style: "width: 350px;"
+                        });
+            
+                        myDialog.connect(myDialog, 'onCancel', function() {this.destroy();});
+                        myDialog.connect(myDialog, 'onExecute', function() { this.destroy(); deleteItem(this.btn);});
+                        
+                        myDialog.show();
+            
+                    });
+        
+            }
             });
             delBtn.startup();
             domConstruct.place(delBtn.domNode, dojo.byId(paneId + "_buttonDiv"));
@@ -1012,7 +1069,6 @@ function ruPhNumberVldtr() {
 }
 
 function sendForm(btn) {
-    console.log("SENDING FORM");
     dojo.xhrPost({
         url: btn.actionUrl,
         form: dojo.byId(btn.formId),
@@ -1031,9 +1087,8 @@ function sendForm(btn) {
 
 
 
-function deleteItem(evt, a, b) {
-    
-    var btn = this;
+function deleteItem(btn) {
+
     
     require([
         "dojo/request",
@@ -1050,7 +1105,6 @@ function deleteItem(evt, a, b) {
         var row = grid.selection.getSelected()[0];
         var selectedRows = grid.selection.getSelected();
         
-        console.log(selectedRows);
         
         for (var i = 0; i < selectedRows.length; i++) {
             request.post(pane.paneData.deleteUrl + "/" + selectedRows[i].id).then(function() {
@@ -1059,16 +1113,17 @@ function deleteItem(evt, a, b) {
         }
         grid.removeSelectedRows();
         grid.store.save();
-        alert("Selected items has been deleted.");
+        
+        require(["dijit/Dialog", "dijit/form/Button", "dojo/domReady!"], function(Dialog, Button){
+            var myDialog = new Dialog({
+                title: "Done!",
+                style: "width: 300px",
+                content: "Selected items has been deleted."
+            });
+
+            myDialog.show();
+        });
         
     })
-    
-}
-
-function selectTab(link) {
-    var parentElementId = link.parentElement.id;
-    dojo.query("#tabs li, div").removeClass("current"); 
-    link.parentElement.setAttribute("class", "current"); 
-    dojo.byId(parentElementId.substring(0, parentElementId.length - 4) + "_content").setAttribute("class", "current");
     
 }

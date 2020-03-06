@@ -58,7 +58,7 @@ public class SubvisionService {
 		
 		subvDao.saveOrUpdate(subv);
 		
-		return Response.accepted(subv).build();
+		return Response.accepted("Subvision has been created.").build();
 	}
 	
 	@POST

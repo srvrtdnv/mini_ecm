@@ -60,7 +60,7 @@ public class CompanyService {
 		
 		compDao.saveOrUpdate(comp);
 		
-		return Response.accepted(comp).build();
+		return Response.accepted("Company has ben created.").build();
 	}
 	
 	@POST

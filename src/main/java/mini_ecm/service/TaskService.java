@@ -89,11 +89,6 @@ public class TaskService {
 		task.setText(text);
 		task.setTaskAuthor(emplDao.findById(AuthenticationService.getUserId(null)));
 		
-		for (Employee doer : doersList) {
-			
-			doer.getTasks().add(task);
-			
-		}
 		
 		int result = taskDao.saveOrUpdate(task);
 		
@@ -113,25 +108,16 @@ public class TaskService {
 			
 			Employee empl = emplDao.findById(Long.parseLong(doer));
 			
-			if (empl == null) return Response.accepted("There is no employee with id = " + id).build();
+			if (empl == null) return Response.accepted("There is no employee with id = " + doer).build();
 			
 			doersList.add(empl);
 			
-			empl.getTasks().add(task);
+			//empl.getTasks().add(task);
 			
 		}
 		
 		if (task == null) return Response.accepted("There is no task with id = " + id).build();
 		
-		for (Employee empl : task.getDoers()) {
-			
-			if (doersList.contains(empl)) continue;
-			
-			empl.getTasks().remove(task);
-			
-			emplDao.saveOrUpdate(empl);
-			
-		}
 
 		task.setSubject(subject);
 		task.setText(text);

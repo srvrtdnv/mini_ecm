@@ -68,7 +68,7 @@ public class HibernateEmployeeDAO implements EmployeeDAO {
 				session.delete(empl);
 				
 				if (subv != null) session.merge(subv);
-				if (comp != null) session.merge(comp);
+				if (comp != null) System.out.println("INTO IF2");
 		
 				session.flush();
 				
@@ -89,7 +89,7 @@ public class HibernateEmployeeDAO implements EmployeeDAO {
 
 	@Override
 	public int saveOrUpdate(Employee empl) {
-Session session = HibernateSessionFactoryHolder.getFactory().openSession();
+		Session session = HibernateSessionFactoryHolder.getFactory().openSession();
 		
 		int result = -1;
 		

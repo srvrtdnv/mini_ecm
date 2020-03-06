@@ -42,10 +42,7 @@ public class Employee {
 	private String position;
 	
 	@JsonIgnore
-	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
-	@JoinTable(name = "tasks_employees", 
-			joinColumns = @JoinColumn(name = "employee_id"),
-            inverseJoinColumns = @JoinColumn(name = "task_id"))
+	@ManyToMany(mappedBy = "doers", fetch = FetchType.EAGER)
 	private Set<Task> tasks;
 	
 	@JsonIgnore

@@ -140,11 +140,6 @@ public class HibernateTaskDAO implements TaskDAO {
 			
 			session.saveOrUpdate(task);
 			
-			//autoupdating many-to-many works only with cascade all
-			for (Employee doer : task.getDoers()) {
-				session.merge(doer);
-			}
-			
 			session.flush();
 			
 			trans.commit();

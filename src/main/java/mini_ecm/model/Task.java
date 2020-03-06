@@ -11,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -39,7 +40,10 @@ public class Task {
 	@Column(name = "is_controlled", columnDefinition = "boolean default false")
 	private boolean isControlled;
 	
-	@ManyToMany(mappedBy = "tasks", fetch = FetchType.EAGER)
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+	@JoinTable(name = "tasks_employees", 
+	inverseJoinColumns = @JoinColumn(name = "employee_id"),
+    joinColumns = @JoinColumn(name = "task_id"))
 	private Set<Employee> doers;
 	
 	@ManyToOne(optional = false, fetch = FetchType.EAGER)

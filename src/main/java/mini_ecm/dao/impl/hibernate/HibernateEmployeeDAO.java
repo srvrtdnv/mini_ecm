@@ -68,7 +68,7 @@ public class HibernateEmployeeDAO implements EmployeeDAO {
 				session.delete(empl);
 				
 				if (subv != null) session.merge(subv);
-				if (comp != null) System.out.println("INTO IF2");
+				if (comp != null) session.merge(comp);
 		
 				session.flush();
 				
